@@ -15,6 +15,10 @@ type GloalStore = {
   conn: DataConnection | undefined;
   status: "idle" | "connecting" | "connected";
   messages: Message[];
+  isChatBoxVisible: boolean;
+  isVideoOn: boolean;
+  isAudioOn: boolean;
+  isDarkMode: boolean;
 };
 
 export const useGlobalStore = create<GloalStore>(() => ({
@@ -24,4 +28,8 @@ export const useGlobalStore = create<GloalStore>(() => ({
   conn: undefined,
   status: "idle",
   messages: [],
+  isChatBoxVisible: true,
+  isVideoOn: false,
+  isAudioOn: false,
+  isDarkMode: false,
 }));
