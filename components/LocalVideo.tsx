@@ -1,16 +1,27 @@
 import { useEffect, useRef } from "react";
 import invariant from "tiny-invariant";
+import { useGlobalStore } from "../stores/globalStore";
 
 const LocalVideo = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const isVideoOn = useGlobalStore((s) => s.isVideoOn);
+  const localVideo = useGlobalStore((s) => s.localVideo);
 
   useEffect(() => {
-    getUserMedia();
-  }, []);
+    if (isVideoOn) {
+      getUserMedia();
+
+      return () => {
+        localVideo?.getTracks().forEach((v) => v.stop());
+      };
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isVideoOn, localVideo]);
 
   const getUserMedia = () => {
     const constraints = {
-      audio: true,
+      audio: false,
       video: { width: 1280, height: 720 },
     };
 
@@ -19,6 +30,7 @@ const LocalVideo = () => {
       .then((mediaStream) => {
         invariant(videoRef.current);
         videoRef.current.srcObject = mediaStream;
+        useGlobalStore.setState({ localVideo: mediaStream });
 
         videoRef.current.onloadedmetadata = () => {
           invariant(videoRef.current);
@@ -27,7 +39,7 @@ const LocalVideo = () => {
       })
       .catch((err) => {
         // always check for errors at the end.
-        console.error(`${err.name}: ${err.message}`);
+        console.error(`Video Player Err: ${err.name}: ${err.message}`);
       });
   };
 

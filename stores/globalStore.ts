@@ -11,25 +11,37 @@ export type Message = {
 type GloalStore = {
   localId: string;
   remoteId: string;
+  isMeCaller: boolean;
   peer: Peer | undefined;
   conn: DataConnection | undefined;
   status: "idle" | "connecting" | "connected";
   messages: Message[];
   isChatBoxVisible: boolean;
-  isVideoOn: boolean;
   isAudioOn: boolean;
+  isVideoOn: boolean;
   isDarkMode: boolean;
+  localVideo: MediaStream | undefined;
+  localAudio: MediaStream | undefined;
+  remoteVideo: MediaStream | undefined;
+  remoteAudio: MediaStream | undefined;
+  isConnectingAudio: boolean;
 };
 
 export const useGlobalStore = create<GloalStore>(() => ({
   localId: "",
   remoteId: "",
+  isMeCaller: false,
   peer: undefined,
   conn: undefined,
   status: "idle",
   messages: [],
   isChatBoxVisible: true,
+  isAudioOn: true,
   isVideoOn: false,
-  isAudioOn: false,
   isDarkMode: false,
+  localVideo: undefined,
+  localAudio: undefined,
+  remoteVideo: undefined,
+  remoteAudio: undefined,
+  isConnectingAudio: false,
 }));

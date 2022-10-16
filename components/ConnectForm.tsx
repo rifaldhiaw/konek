@@ -13,7 +13,7 @@ const ConnectForm = () => {
 
     invariant(peer);
     const conn = peer.connect(remoteId);
-    useGlobalStore.setState({ conn });
+    useGlobalStore.setState({ conn, isMeCaller: true });
 
     conn.on("data", (data) => {
       msgUtils.receive(data as Message);

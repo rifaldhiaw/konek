@@ -2,7 +2,9 @@ import "iconify-icon";
 import type { NextPage } from "next";
 import dynamic from "next/dynamic";
 import ChatBox from "../components/ChatBox";
+import LocalAudio from "../components/LocalAudio";
 import LocalVideo from "../components/LocalVideo";
+import RemoteAudio from "../components/RemoteAudio";
 import ToolBar from "../components/ToolBar";
 
 import { useGlobalStore } from "../stores/globalStore";
@@ -69,7 +71,7 @@ export const Main = () => {
           <div className="h-full flex justify-center items-center bottom-2 left-5 text-lg ">
             <div className="avatar placeholder">
               <div className="bg-base-300 rounded-full w-24">
-                <span className="text-3xl font-semibold">AW</span>
+                <span className="text-3xl font-semibold">US</span>
               </div>
             </div>
           </div>
@@ -83,9 +85,9 @@ export const Main = () => {
       <div className="flex flex-1 h-0 ml-5 justify-between">
         <div className="relative flex flex-1 flex-col items-stretch pr-5 max-w-3xl mx-auto">
           <div className="h-5" />
-          {isVideoOn ? video : videoPlaceholder}
+          {videoPlaceholder}
           <div className="h-3" />
-          {video}
+          {videoPlaceholder}
           <div className="h-5" />
         </div>
 
@@ -95,6 +97,9 @@ export const Main = () => {
           </div>
         )}
       </div>
+
+      <LocalAudio />
+      <RemoteAudio />
 
       <ToolBar />
     </div>
