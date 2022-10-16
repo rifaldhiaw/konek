@@ -7,12 +7,12 @@ const ChatBox = () => {
   const localId = useGlobalStore((s) => s.localId);
 
   return (
-    <div className="card shadow bg-white w-[500px] max-h-[90%]">
+    <div className="card border border-slate-200 bg-white flex-1 h-full p-2">
       <h2 className="text-center text-xl font-semibold p-5 border-b border-slate-200">
         Chat Box
       </h2>
 
-      <div className="flex flex-col overflow-y-scroll py-5 p-5 bg-slate-50">
+      <div className="flex flex-1 flex-col overflow-y-scroll py-5 p-5 bg-slate-50">
         {messages.map((m, i) => {
           const isMine = m.owner === localId;
 
