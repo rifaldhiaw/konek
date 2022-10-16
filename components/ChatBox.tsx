@@ -34,8 +34,8 @@ const ChatBox = () => {
                 )}
                 <div
                   className={
-                    "rounded-lg shadow-md px-2 py-1 text-neutral " +
-                    (isMine ? "bg-green-100" : "bg-base-100")
+                    "rounded-lg shadow-md px-2 py-1 " +
+                    (isMine ? "bg-green-100 text-neutral" : "bg-base-100")
                   }
                 >
                   {m.body}
