@@ -29,7 +29,7 @@ const ConnectForm = () => {
   };
 
   return (
-    <div className="card p-10 bg-white shadow-md prose">
+    <div className="card p-10 bg-neutral-content shadow-md prose">
       <h3 className="text-center">Enter Your Friend ID</h3>
       <form className="flex flex-col" onSubmit={onSubmit}>
         <input

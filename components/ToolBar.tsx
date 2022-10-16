@@ -8,7 +8,7 @@ const ToolBar = () => {
   const isDarkMode = useGlobalStore((s) => s.isDarkMode);
 
   return (
-    <div className="flex bg-white p-4 justify-center">
+    <div className="flex bg-base-100 p-4 justify-center">
       <ActionButton
         isOn={isDarkMode}
         icon="dark"

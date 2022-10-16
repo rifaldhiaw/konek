@@ -16,6 +16,7 @@ const ConnectForm = dynamic(() => import("../components/ConnectForm"), {
 const Home: NextPage = () => {
   const peer = useGlobalStore((s) => s.peer);
   const status = useGlobalStore((s) => s.status);
+  const isDarkMode = useGlobalStore((s) => s.isDarkMode);
 
   const renderByStatus = () => {
     switch (status) {
@@ -35,7 +36,10 @@ const Home: NextPage = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-slate-100">
+    <div
+      className="flex flex-col h-screen w-screen bg-base-300"
+      data-theme={isDarkMode ? "dark" : "light"}
+    >
       {/* {renderByStatus()} */}
       <Main />
     </div>
@@ -47,7 +51,7 @@ export const Main = () => {
 
   const video = (
     <div className="flex flex-1 h-0 max-w-xl">
-      <div className="flex flex-1 rounded-3xl shadow bg-white p-2">
+      <div className="flex flex-1 rounded-3xl shadow bg-base-100 p-2">
         <div className="card h-full w-full">
           <div className="absolute shadow-xl text-white bottom-2 left-5">
             Rifaldhi AW
@@ -59,7 +63,7 @@ export const Main = () => {
   );
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 flex-col overflow-auto">
       <div className="flex flex-1 h-0 ml-5">
         <div className="relative flex flex-1 flex-col items-center pr-20">
           <div className="h-5" />
