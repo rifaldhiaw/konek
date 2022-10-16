@@ -69,7 +69,7 @@ export const Main = () => {
           <div className="h-full flex justify-center items-center bottom-2 left-5 text-lg ">
             <div className="avatar placeholder">
               <div className="bg-base-300 rounded-full w-24">
-                <span className="text-3xl">AW</span>
+                <span className="text-3xl font-semibold">AW</span>
               </div>
             </div>
           </div>
