@@ -1,4 +1,5 @@
-import { createMachine } from "xstate";
+import { MediaConnection } from "peerjs";
+import { assign, createMachine } from "xstate";
 import create from "zustand";
 import xstate from "zustand-middleware-xstate";
 import {
@@ -10,33 +11,53 @@ import {
   unmuteAudio,
 } from "./audioConnectionAction";
 
-export type AudioConnectionContext = {};
+export type AudioConnectionContext = {
+  localStream?: MediaStream;
+  remoteStream?: MediaStream;
+  connection?: MediaConnection;
+};
 
 export type AudioConnectionEvents =
   | { type: "START" }
   | { type: "FAILED_GET_LOCAL_AUDIO" }
-  | { type: "LOCAL_AUDIO_READY" }
+  | { type: "LOCAL_AUDIO_READY"; localStream: MediaStream }
   | { type: "CALL_USER" }
-  | { type: "CALL_RECEIVED" }
-  | { type: "ANSWERED" }
-  | { type: "CONNECTED" }
+  | { type: "CALL_USER_OK"; connection: MediaConnection }
+  | { type: "CALL_RECEIVED"; connection: MediaConnection }
+  | { type: "ANSWERED"; remoteStream: MediaStream }
+  | { type: "CONNECTED"; remoteStream: MediaStream }
   | { type: "MUTE" }
   | { type: "UNMUTE" };
 
-export type AudioConnectionStates = {
-  value:
-    | "idle"
-    | "gettingUserMedia"
-    | "ready"
-    | "callingUser"
-    | "answering"
-    | "inCall.audioOn"
-    | "inCall.audioOff";
-  context: AudioConnectionContext;
-};
+export type AudioConnectionStates =
+  | {
+      value: "idle" | "gettingUserMedia";
+      context: AudioConnectionContext;
+    }
+  | {
+      value: "ready" | "callingUser";
+      context: AudioConnectionContext & {
+        localStream: MediaStream;
+      };
+    }
+  | {
+      value: "waitingForAnswer" | "answering";
+      context: AudioConnectionContext & {
+        localStream: MediaStream;
+        connection: MediaConnection;
+      };
+    }
+  | {
+      value: "inCall" | "inCall.audioOn" | "inCall.audioOff";
+      context: AudioConnectionContext & {
+        localStream: MediaStream;
+        remoteStream: MediaStream;
+        connection: MediaConnection;
+      };
+    };
 
 const audioConnectionMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5QEMCuECWB7AwlgdvmAMYAu2+AdBhADZgDEAygCoCCASiwNoAMAuolAAHLLAzkCQkAA9EAWgDsvAMyUAjMoBsAJi3r1vACwBWRUYA0IAJ6ItRygE5HJgBy8XJoysU7eWgF8AqzRMXAIiMgpKGFJyfCgAVVgwACcAWUgMZAYAGQB5HDZcgH02RIARAEl8ko4AUTYKgE0+QSQQUXFJfGk5BHkVXh1KI0ctRxV1M0dzRVcrWwR7Jxd3T29fVSCQ9Gw8QhIemLA4jATktMzMHIAxNirc+oqSgHF6lhKCotLy6vy2tIuhIKH0FOYTJRfCYhuoJu5XDDFohNFpKB5HK4tGYtIj7K5XDsQKF9hEjtFUmBkBBrAwfqVEkx6hxAR1gT0wQh1K4HKpzNy4WYTC4VMiuSYRvo4bxBd4jAYiSTwocogRKJTqbT6XV6jh6lUAGrPVkiMQgqQdfpwtETFRaeGKdQ6dzGMVGVzolQ6RS+H3zaa8RSKvbKyLHYjIWi0c5JFKpBhsAByTAA6szjQIgWaOZa7FpeBodO7FEMjPDXDoxZo1FjvAYSyYMdjg2EDmHosh8LAAO5pGN0-KJxO6lgZ9qm7qg3PLfOUVyOQPunQ6L06Mxin3o5T14Urwy8Ewt0kq47nHCR2iUJX5fAMdKJUcmzrZqegK2qNT+Ez2FRTLRDRxKxsFFXDUFcK00NwjB0AUj1Dck1TPC8rxDfIADM0IYRJE3vR9MzZF8LTfFFhgccYZXcMZuUcbkxXkJ1KCLbFZn0VQaMmIJghAfAsAgOBpCVNsEKoGh6CzSciNkBR3EhMYjHkyZlyMA8xQJUYeUMO0vTcFQTHUOChNVKhYniWMriyZBxPNXpp3kPSPRMCVeEDL1nI8SxgIQNT3XlHRnAUvS4QMskjPVKkaSsnNiIGbkNAlNd1BomEaPkoClm8jTVH-NdQMPLjBJC8MLxjS5Uki18pIQCU1HUL1lEc3wjHmBZPLhD1lJ8KZlEUSZFDy3ZW0Kjsu17VIY3KyT+hhT9JnnBtUtxDdFEoMwZTtH0630friRDQzT3wc8oxQsIbwmmzopokYJWxOEpnItwq2cucepUUwDGMRR8yMYKT2iJCjuvDCzs5AxZ10dxlGcyYnRMR61B8SY3sMJqvp+9tEIOi9genWsVr0PT-0S-MHs8+iZUYssvq0H1NFq7aCt+yT2Qq-p5ERNQ5IU1dlNh0nEoLJipXMFQXEDPKgiAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QEMCuECWB7AwlgdvmAMYAu2+AdBhADZgDEAygCoCCASiwNoAMAuolAAHLLAzkCQkAA9EAWgDsvAMyUAjMoBsAJi3r1vACwBWRUYA0IAJ6ItRygE5HJgBy8XJoysU7eWgF8AqzRMXAIiMgpKGFJyfCgAVVgwACcAWUgMZAYAGQB5HDZcgH02RIARAEl8ko4AUTYKgE0+QSQQUXFJfGk5BHkVXh1KE39hrV51FUd1V0crWwQTdUpeXkUxlRXHFXUjXlcTIJD0bDxCEh6YsDiMBOS0zMwcgDE2Ktz6ipKAcXqWCUCkVSuVqvk2tIuhIKH0FOYTJRfCYhuotI53EcVItEJotGtnK4tGYtEd7K5XCcQKFzhErtFUmBkBBrAwQaVEkx6hxIR1oT04QNtk51oc5iojDoDkZFDiEGjVuY5h4MYotOYjFSaeFLlECJRGczWey6vUcPUqgA1b68kRiGFSDr9NH49EqLTo1yKdQ6dzGOVGVxrFQ6RS+MOKVzqMaKLVnHWRa7EZC0Wj3JIpVJs4ocrkcEr5ADSts69oFTsQOkcvEoRgO7jGRkc3qJcoVSKM4pMOi8+xDmuC1PjF0T0QA7sgYQlXlhUmx8LAx2kGGwAHJMADq3JtAihZdhFYQHsclG2pgOMcOuzb+g7cwMaKlobmcbCI-p+uQC6XqXTbPyq6rmaLA7u0drdAeoD9Mep5eF4vCXvM2I2HYDjOG4HjDK4gZjIEg7au+epUPcOAprQlDavk+AMOkiQgSW-KQbIuKqIiFJNpo1a7Ci6g3qs7GBvojbdmGr60rq1wkWRFHxvkABmckMIkq60fRu58vujpQSxoZIoojimGM2Hca4cqDGokyqFWxidmYPZBIO+BYBAcDSARdJEdQdBgHuEFacxAwNrWBl1rsOhSghcoUrW2GGO6IZuNs6hiQmH5ULE8QZk8WTIL5Dq9Ie8grEGJjdusighqKBlRUGgadlWIUuAYeGnG+HnXIaLJ5eW2kDHMGjdj26izCisx1joNUxZ2qhaAlrjbClhFJmR6aPKk3VMc6IaUPYezhToMz7F4lgofKRyUAdUwIWqxI9uqi3teOk6ZTOc7fmkG3+f0Mr4hVaIqBK7oelWbbnZdYq7NWOgGA9EnRF+i5pOmn0Fb1jYXcYob6OYUZmMhSxhmsygGJsjgHYYCGw6O+pSamMlhFRKOCiNp6mPpHg+vYzZyvpox3dM6rqoYvhU2l1D4KRdOUQpTOHs1ah1hVdaTAdJjElFIzDGrAtqt6Gw6KLnm07Qsu9USiis2YXGc02sqnfIPojJZexzI4ky6MYhs9aWfmowF8hYsFdZNiGEUmGZ0OrJZVYyjKbukg5ARAA */
   createMachine<
     AudioConnectionContext,
     AudioConnectionEvents,
@@ -60,7 +81,7 @@ const audioConnectionMachine =
           on: {
             LOCAL_AUDIO_READY: {
               target: "ready",
-              actions: "setupConnectionListener",
+              actions: ["setupConnectionListener", "setLocalStream"],
             },
             FAILED_GET_LOCAL_AUDIO: {
               target: "idle",
@@ -75,14 +96,23 @@ const audioConnectionMachine =
             },
             CALL_RECEIVED: {
               target: "answering",
-              actions: "answerCall",
+              actions: ["setConnection", "answerCall"],
             },
           },
         },
         callingUser: {
           on: {
+            CALL_USER_OK: {
+              target: "waitingForAnswer",
+              actions: "setConnection",
+            },
+          },
+        },
+        waitingForAnswer: {
+          on: {
             ANSWERED: {
               target: "inCall",
+              actions: "setRemoteStream",
             },
           },
         },
@@ -90,6 +120,7 @@ const audioConnectionMachine =
           on: {
             CONNECTED: {
               target: "inCall",
+              actions: "setRemoteStream",
             },
           },
         },
@@ -124,6 +155,25 @@ const audioConnectionMachine =
         answerCall,
         muteAudio,
         unmuteAudio,
+        // setter,
+        setLocalStream: assign({
+          localStream: (context, event) => {
+            if (event.type !== "LOCAL_AUDIO_READY") return;
+            return event.localStream;
+          },
+        }),
+        setRemoteStream: assign({
+          remoteStream: (context, event) => {
+            if (event.type !== "CONNECTED" && event.type !== "ANSWERED") return;
+            return event.remoteStream;
+          },
+        }),
+        setConnection: assign({
+          connection: (context, event) => {
+            if (event.type !== "CALL_USER_OK") return;
+            return event.connection;
+          },
+        }),
       },
     }
   );

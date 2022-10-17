@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
 import invariant from "tiny-invariant";
-import { useGlobalStore } from "../stores/globalStore";
+import { useAudioConnection } from "../machines/audioConnection/audioConnectionMachine";
 
 const RemoteAudio = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
-  const remoteAudio = useGlobalStore((s) => s.remoteAudio);
+  const remoteAudio = useAudioConnection((s) => s.state.context.remoteStream);
 
   // Get Local Audio Stream
   useEffect(() => {

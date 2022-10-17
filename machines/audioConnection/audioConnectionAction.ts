@@ -1,13 +1,19 @@
 import { MediaConnection } from "peerjs";
 import invariant from "tiny-invariant";
 import { useGlobalStore } from "../../stores/globalStore";
-import { sendAudioConnEvent } from "./audioConnectionMachine";
+import {
+  AudioConnectionContext,
+  AudioConnectionEvents,
+  sendAudioConnEvent,
+} from "./audioConnectionMachine";
 
 export const getUserMedia = () => {
   navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(
     (localStream) => {
-      useGlobalStore.setState({ localAudio: localStream });
-      sendAudioConnEvent("LOCAL_AUDIO_READY");
+      sendAudioConnEvent({
+        type: "LOCAL_AUDIO_READY",
+        localStream: localStream,
+      });
     },
     (err) => {
       sendAudioConnEvent("FAILED_GET_LOCAL_AUDIO");
@@ -21,52 +27,60 @@ export const setupConnectionListener = () => {
   invariant(state.peer);
 
   const listener = (call: MediaConnection) => {
-    useGlobalStore.setState({ audioCall: call });
-    sendAudioConnEvent("CALL_RECEIVED");
+    sendAudioConnEvent({ type: "CALL_RECEIVED", connection: call });
 
     call.on("stream", (remoteStream) => {
-      console.log("waiter rec stream", remoteStream);
-      sendAudioConnEvent("CONNECTED");
-      useGlobalStore.setState({ remoteAudio: remoteStream });
+      sendAudioConnEvent({ type: "CONNECTED", remoteStream });
     });
   };
 
   state.peer.on("call", listener);
 };
 
-export const callUser = () => {
+export const callUser = (
+  context: AudioConnectionContext,
+  event: AudioConnectionEvents
+) => {
   const state = useGlobalStore.getState();
   invariant(state.peer);
-  invariant(state.localAudio);
+  invariant(context.localStream);
 
-  var call = state.peer.call(state.remoteId, state.localAudio);
-  useGlobalStore.setState({ audioCall: call });
+  var call = state.peer.call(state.remoteId, context.localStream);
+
+  sendAudioConnEvent({
+    type: "CALL_USER_OK",
+    connection: call,
+  });
 
   call.on("stream", function (remoteStream) {
-    console.log("caller rec stream", remoteStream);
-    sendAudioConnEvent("ANSWERED");
-    useGlobalStore.setState({ remoteAudio: remoteStream });
+    sendAudioConnEvent({ type: "ANSWERED", remoteStream });
   });
 };
 
-export const answerCall = () => {
-  const state = useGlobalStore.getState();
-  invariant(state.audioCall);
-  invariant(state.localAudio);
+export const answerCall = (
+  context: AudioConnectionContext,
+  event: AudioConnectionEvents
+) => {
+  invariant(context.localStream);
+  if (event.type !== "CALL_RECEIVED") return;
 
-  state.audioCall.answer(state.localAudio);
+  event.connection.answer(context.localStream);
 };
 
-export const muteAudio = () => {
-  const state = useGlobalStore.getState();
-  invariant(state.localAudio);
+export const muteAudio = (
+  context: AudioConnectionContext,
+  event: AudioConnectionEvents
+) => {
+  invariant(context.localStream);
 
-  state.localAudio.getAudioTracks().forEach((v) => (v.enabled = false));
+  context.localStream.getAudioTracks().forEach((v) => (v.enabled = false));
 };
 
-export const unmuteAudio = () => {
-  const state = useGlobalStore.getState();
-  invariant(state.localAudio);
+export const unmuteAudio = (
+  context: AudioConnectionContext,
+  event: AudioConnectionEvents
+) => {
+  invariant(context.localStream);
 
-  state.localAudio.getAudioTracks().forEach((v) => (v.enabled = true));
+  context.localStream.getAudioTracks().forEach((v) => (v.enabled = true));
 };
