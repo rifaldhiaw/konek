@@ -1,5 +1,6 @@
 import { ChangeEventHandler, FormEventHandler } from "react";
-import { sendConnEvent } from "../machines/coreConnectionMachine";
+import { sendAudioConnEvent } from "../machines/audioConnection/audioConnectionMachine";
+import { sendDataConnEvent } from "../machines/dataConnection/dataConnectionMachine";
 import { useGlobalStore } from "../stores/globalStore";
 
 const LocalIDForm = () => {
@@ -9,7 +10,8 @@ const LocalIDForm = () => {
     e.preventDefault();
     if (!localId) return;
 
-    sendConnEvent("SUBMIT_ID");
+    sendDataConnEvent("START");
+    sendAudioConnEvent("START");
   };
 
   const onIdChange: ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -26,7 +28,7 @@ const LocalIDForm = () => {
           placeholder="my-unique-id"
           onChange={onIdChange}
         />
-        <button type="submit" className="btn mt-5">
+        <button type="submit" className="btn mt-5 ">
           Enter
         </button>
       </form>

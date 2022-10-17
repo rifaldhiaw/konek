@@ -1,4 +1,4 @@
-import Peer, { DataConnection } from "peerjs";
+import Peer, { DataConnection, MediaConnection } from "peerjs";
 import create from "zustand";
 
 export type Message = {
@@ -13,6 +13,7 @@ type GloalStore = {
   remoteId: string;
   peer: Peer | undefined;
   conn: DataConnection | undefined;
+  audioCall: MediaConnection | undefined;
   messages: Message[];
   isChatBoxVisible: boolean;
   isAudioOn: boolean;
@@ -29,6 +30,7 @@ export const useGlobalStore = create<GloalStore>(() => ({
   remoteId: "",
   peer: undefined,
   conn: undefined,
+  audioCall: undefined,
   messages: [],
   isChatBoxVisible: true,
   isAudioOn: true,

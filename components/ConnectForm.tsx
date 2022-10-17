@@ -1,22 +1,31 @@
 import { ChangeEventHandler, FormEventHandler } from "react";
 import {
-  sendConnEvent,
-  useConnectionMachine,
-} from "../machines/coreConnectionMachine";
+  sendAudioConnEvent,
+  useAudioConnection,
+} from "../machines/audioConnection/audioConnectionMachine";
+import {
+  sendDataConnEvent,
+  useDataConnection,
+} from "../machines/dataConnection/dataConnectionMachine";
 import { useGlobalStore } from "../stores/globalStore";
 
 const ConnectForm = () => {
   const remoteId = useGlobalStore((s) => s.remoteId);
-  const isLoading = useConnectionMachine(
-    (s) =>
-      s.state.matches("connectingData") || s.state.matches("connectingAudio")
+  const isDataConnecting = useDataConnection((s) =>
+    s.state.matches("connectingToRemoteUser")
   );
+  const isCallingUser = useAudioConnection((s) =>
+    s.state.matches("callingUser")
+  );
+
+  const isLoading = isDataConnecting || isCallingUser;
 
   const onSubmit: FormEventHandler = (e) => {
     e.preventDefault();
     if (!remoteId.trim()) return;
 
-    sendConnEvent("CONNECT_DATA");
+    sendDataConnEvent("CONNECT_TO_USER");
+    sendAudioConnEvent("CALL_USER");
   };
 
   const onIdChange: ChangeEventHandler<HTMLInputElement> = (e) => {

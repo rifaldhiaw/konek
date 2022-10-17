@@ -1,5 +1,6 @@
 import { NextPage } from "next";
-import { useConnectionMachine } from "../machines/coreConnectionMachine";
+import { useAudioConnection } from "../machines/audioConnection/audioConnectionMachine";
+import { useDataConnection } from "../machines/dataConnection/dataConnectionMachine";
 import { useGlobalStore } from "../stores/globalStore";
 import ChatBox from "./ChatBox";
 import ConnectForm from "./ConnectForm";
@@ -10,10 +11,13 @@ import RemoteAudio from "./RemoteAudio";
 import ToolBar from "./ToolBar";
 
 const Home: NextPage = () => {
-  const isInCall = useConnectionMachine((s) => s.state.matches("inCall"));
-  const isWaitingLocalId = useConnectionMachine((s) =>
-    s.state.matches("waitingLocalId")
+  const isInCall = useDataConnection((s) => s.state.matches("connected"));
+
+  const isDataIdle = useDataConnection((s) => s.state.matches("idle"));
+  const isGettingUserMedia = useAudioConnection((s) =>
+    s.state.matches("gettingUserMedia")
   );
+
   const isDarkMode = useGlobalStore((s) => s.isDarkMode);
 
   const renderByStatus = () => {
@@ -23,7 +27,7 @@ const Home: NextPage = () => {
 
     return (
       <div className="flex justify-center items-center flex-1">
-        {isWaitingLocalId ? <LocalIDForm /> : <ConnectForm />}
+        {isDataIdle || isGettingUserMedia ? <LocalIDForm /> : <ConnectForm />}
       </div>
     );
   };
