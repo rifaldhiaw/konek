@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { useGlobalStore } from "../stores/globalStore";
+import DoubleCheck from "../icons/DoubleCheck";
+import SingleCheck from "../icons/SingleCheck";
+import { Message, useGlobalStore } from "../stores/globalStore";
 import { msgUtils } from "../utils/messageUtils";
 
 const ChatBox = () => {
@@ -23,23 +25,16 @@ const ChatBox = () => {
 
             return (
               <div
+                key={m.id}
                 className={
                   "my-1 max-w-[80%] " +
                   (isMine ? "self-end text-right" : "self-start text-left")
                 }
-                key={m.id}
               >
                 {!isPrevSameOwner && (
                   <div className="mx-2 mb-1 font-semibold">{m.owner}</div>
                 )}
-                <div
-                  className={
-                    "rounded-lg shadow-md px-2 py-1 " +
-                    (isMine ? "bg-green-100 text-neutral" : "bg-base-100")
-                  }
-                >
-                  {m.body}
-                </div>
+                <MessageBubble message={m} isMine={isMine} />
               </div>
             );
           })}
@@ -48,6 +43,33 @@ const ChatBox = () => {
 
       <div className="p-5 border-t border-base-300 w-full">
         <ChatInput />
+      </div>
+    </div>
+  );
+};
+
+const MessageBubble = (props: { message: Message; isMine: boolean }) => {
+  return (
+    <div
+      className={
+        "rounded-lg shadow-md px-2 py-1 " +
+        (props.isMine ? "bg-green-100 text-neutral" : "bg-base-100")
+      }
+    >
+      <div
+        className={
+          "flex items-center " +
+          (props.isMine ? "flex-row" : "flex-row-reverse")
+        }
+      >
+        {props.message.body}
+        <span className={props.isMine ? "ml-2" : "mr-2"}>
+          {props.message.status === "pending" ? (
+            <SingleCheck />
+          ) : (
+            <DoubleCheck />
+          )}
+        </span>
       </div>
     </div>
   );
