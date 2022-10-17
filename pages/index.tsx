@@ -2,11 +2,13 @@ import "iconify-icon";
 import type { NextPage } from "next";
 import dynamic from "next/dynamic";
 import { useEffect } from "react";
+import { interpret } from "xstate";
 import ChatBox from "../components/ChatBox";
 import LocalAudio from "../components/LocalAudio";
 import LocalVideo from "../components/LocalVideo";
 import RemoteAudio from "../components/RemoteAudio";
 import ToolBar from "../components/ToolBar";
+import { CoreConnectionState } from "../machines/coreConnectionMachine";
 
 import { useGlobalStore } from "../stores/globalStore";
 const LocalIDForm = dynamic(() => import("../components/LocalIDForm"), {
@@ -22,7 +24,18 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     import("../machines/coreConnectionMachine").then((o) => {
-      o.coreConnectionService.start();
+      const coreConnectionService = interpret(
+        o.coreConnectionMachine
+      ).onTransition((state) => {
+        console.log({ transition: state.toStrings()[0] });
+
+        useGlobalStore.setState({
+          machineState: state.toStrings()[0] as CoreConnectionState,
+        });
+      });
+
+      coreConnectionService.start();
+      useGlobalStore.setState({ connectionService: coreConnectionService });
     });
   }, []);
 

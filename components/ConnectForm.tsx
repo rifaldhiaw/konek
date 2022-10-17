@@ -1,6 +1,5 @@
 import { ChangeEventHandler, FormEventHandler } from "react";
-import { coreConnectionService } from "../machines/coreConnectionMachine";
-import { useGlobalStore } from "../stores/globalStore";
+import { sendEvent, useGlobalStore } from "../stores/globalStore";
 
 const ConnectForm = () => {
   const remoteId = useGlobalStore((s) => s.remoteId);
@@ -14,7 +13,7 @@ const ConnectForm = () => {
     e.preventDefault();
     if (!remoteId.trim()) return;
 
-    coreConnectionService.send({ type: "CONNECT_DATA" });
+    sendEvent({ type: "CONNECT_DATA" });
   };
 
   const onIdChange: ChangeEventHandler<HTMLInputElement> = (e) => {

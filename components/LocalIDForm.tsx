@@ -1,6 +1,5 @@
 import { ChangeEventHandler, FormEventHandler } from "react";
-import { coreConnectionService } from "../machines/coreConnectionMachine";
-import { useGlobalStore } from "../stores/globalStore";
+import { sendEvent, useGlobalStore } from "../stores/globalStore";
 
 const LocalIDForm = () => {
   const localId = useGlobalStore((s) => s.localId);
@@ -9,7 +8,7 @@ const LocalIDForm = () => {
     e.preventDefault();
     if (!localId) return;
 
-    coreConnectionService.send({ type: "SUBMIT_ID" });
+    sendEvent({ type: "SUBMIT_ID" });
   };
 
   const onIdChange: ChangeEventHandler<HTMLInputElement> = (e) => {

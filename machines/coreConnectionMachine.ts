@@ -1,7 +1,7 @@
 import Peer, { MediaConnection } from "peerjs";
 import invariant from "tiny-invariant";
-import { createMachine, interpret } from "xstate";
-import { Message, useGlobalStore } from "../stores/globalStore";
+import { createMachine } from "xstate";
+import { Message, sendEvent, useGlobalStore } from "../stores/globalStore";
 import { msgUtils } from "../utils/messageUtils";
 
 const initPeer = () => {
@@ -18,7 +18,7 @@ const initPeer = () => {
     });
 
     conn.on("open", () => {
-      coreConnectionService.send({ type: "DATA_CONNECTED" });
+      sendEvent({ type: "DATA_CONNECTED" });
     });
   });
 };
@@ -35,7 +35,7 @@ const connectData = () => {
   });
 
   conn.on("open", () => {
-    coreConnectionService.send({ type: "DATA_CONNECTED" });
+    sendEvent({ type: "DATA_CONNECTED" });
   });
 };
 
@@ -52,7 +52,7 @@ const callAudio = () => {
 
       call.on("stream", function (remoteStream) {
         console.log("got sream caller");
-        coreConnectionService.send({ type: "AUDIO_CONNECTED" });
+        sendEvent({ type: "AUDIO_CONNECTED" });
         useGlobalStore.setState({ remoteAudio: remoteStream });
       });
     })
@@ -71,7 +71,7 @@ const setupAudioConnectionListener = () => {
         call.answer(localStream);
         call.on("stream", (remoteStream) => {
           console.log("got sream in listener");
-          coreConnectionService.send({ type: "AUDIO_CONNECTED" });
+          sendEvent({ type: "AUDIO_CONNECTED" });
           useGlobalStore.setState({ remoteAudio: remoteStream });
         });
       },
@@ -159,13 +159,3 @@ export const coreConnectionMachine =
       },
     }
   );
-
-export const coreConnectionService = interpret(
-  coreConnectionMachine
-).onTransition((state) => {
-  console.log({ transition: state.toStrings()[0] });
-
-  useGlobalStore.setState({
-    machineState: state.toStrings()[0] as CoreConnectionState,
-  });
-});
