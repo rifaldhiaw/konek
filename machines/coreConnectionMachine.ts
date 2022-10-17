@@ -19,7 +19,6 @@ const initPeer = () => {
 
     conn.on("open", () => {
       coreConnectionService.send({ type: "DATA_CONNECTED" });
-      useGlobalStore.setState({ status: "connected" });
     });
   });
 };
@@ -29,6 +28,7 @@ const connectData = () => {
 
   invariant(state.peer);
   const conn = state.peer.connect(state.remoteId);
+  useGlobalStore.setState({ conn });
 
   conn.on("data", (data) => {
     msgUtils.receive(data as Message);
@@ -36,7 +36,6 @@ const connectData = () => {
 
   conn.on("open", () => {
     coreConnectionService.send({ type: "DATA_CONNECTED" });
-    useGlobalStore.setState({ status: "connected" });
   });
 };
 
@@ -96,13 +95,13 @@ export type CoreConnectionState =
   | "inCall";
 
 export const coreConnectionMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5QGMD2AnMBhVA7XYyALgJZ4B0A7gIYmm5QAyqy1ANgJIQDEAygKoAhALIcAKgH0OAEQDaABgC6iUAAdUsOmVwqQAD0QAmefPIB2ABwBOeQDZjVqwFYnF27YA0IAJ6Jr5d1tXAGYLeTCARisLAF8YrzRMHHxCUgo0FOIAeXQAdVoibiwsgDkSgFEsSWkAQTEahWUkEHVNNJ1mgwQneWDzXojDKIi3MIAWL18EYzHyMcdrQytgs2CnKzM4hIxsPAJibXIM-aIc-LpuWvqJYrLKsQ5SiQAlSvKOADVyuSVdVq08Louj0+mYBkMrCNbONJn5DORHI4nCsImMhitNvEQIldpl2kc9qkSAxpNQiNRLnUajdShUqt9Gn8NACOqAulZbH0LGZ5hZDBYLGMzE5bBMfEZ5LN5tErEsVmsNltsTtkidDsciQwagBXCBkbg1fjSR40u70n5NNTM9pAxCo+QRcgWBXBCLQiLBIXBWHTQxmBEC4x+kJOQxOMZKnGqokUGhaLW6sjRg54A1Gk23OliBm-Zr-G2dO1Rf3yZarCKuGzLb3ihAROxzQOo9aeyxmQxxLG4VAQOC6KOElO4KgFYlMFjsLhMtraW0INE+iIegLhwVjaHtwU8yMqwf4jXZPIFacsufBYJWJ0tsEX2wbBe1pd9IJjNcb-lCiNYgd49V7sekuSJ4FmyiCWJe66lvytjyMYKxOD6hj8o2fKwcKzqhuGO5JP+6T-gmeqoMBs6FnWQymKiYyvqEpZrGsiHIa+qHBhhYZftsOG-rGo4EUmuGsi01okaBCAclyPLRPyW4imKUz1rYAZ8s2yxCtyHbfruXHDsSWDsGwxGAqRbpLuQTiWB6ERmKsMGoouqLkBWr6hkhZkcrB2G4mqhlWjO3n6IgAC0ni1kF5AmOFEWRZicRAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QGMD2AnMBhVA7XYyALgJZ4B0A7gIYmm5QAyqy1ANgJIQDEAygKoAhALIcAKgH0OAEQDaABgC6iUAAdUsOmVwqQAD0QAmefPIB2ABwBOeQFYLARkMA2W2du2ANCACeia+TOQa7uAMxmTg5WFgC+Md5omDj4hKQUaCnEAPLoAOq09FDS1ETU3FhZAHKVAKJYktIAgmKNCspIIOqaaTodBggeVuTyDrbODgAsFhbOVs4R3n4IxhPktiYjFqEOjtEOznEJGNh4BMTa5BlnRDn5WgzFpdxNLRIV1XViNXJKul1aeF0-UGw1G4ymMzmC18-kM5CsCIRWwstkME0MoVshxAiROmR6l1OqRIDxKZRejTeVVq9W+bT+GgBvVA-QcIzhoWMhkcHjMzgmrkWRnkq3WJh2212jgO8Rxx2S1wuV2JDEaAFcIGRuI1+NIOFkqR9aT92mpGT0gYhJutyNyHA4zBNJUFQkLloYzPDph6PIYXJNRtjcQriRQaPcoOrNagQ+c8NrdfrDTSviaGd1tJaEE4JrY1qFrFYIs4-eEHG62c5yBDDB57HN7OE4rLcKgIHBdMGiXHcFQCiSmCx2Fx00ys+iKw5QoFbBMrJNHaNwkWg-LuwTldk8v3SaVRxa+ohQqEhiirOFxqETFsPJPp64525DDsUY-V0l10rP7vqPvM4eEC2T0bBLUIJnkCx5DA+Y3T9Cxq2mbYzERc97VCd88UVdJv0jDUyD-QEAKcew1msMwzDsHN+QsWDuQQrYHRQ7Ypww2MCXDQoozINj-zNDNCJZK12XITl5DtXl+UFGFs3kKtogsQxolk2YwhlI4P3xC4SSwdg2AI5l9CtIJTDEzkglREVZysSdVlGR9nGmF0bAmVjPwEzpzV4wyEAAWmcN0-ObGIgA */
   createMachine<{}>(
     {
       context: {},
+      predictableActionArguments: true,
       id: "coreConnection",
       initial: "waitingLocalId",
-      predictableActionArguments: true,
       states: {
         waitingLocalId: {
           on: {

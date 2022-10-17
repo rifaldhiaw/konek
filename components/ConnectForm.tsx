@@ -4,6 +4,11 @@ import { useGlobalStore } from "../stores/globalStore";
 
 const ConnectForm = () => {
   const remoteId = useGlobalStore((s) => s.remoteId);
+  const isLoading = useGlobalStore(
+    (s) =>
+      s.machineState === "connectingData" ||
+      s.machineState === "connectingAudio"
+  );
 
   const onSubmit: FormEventHandler = (e) => {
     e.preventDefault();
@@ -26,7 +31,10 @@ const ConnectForm = () => {
           placeholder="friend-id"
           onChange={onIdChange}
         />
-        <button type="submit" className="btn mt-5">
+        <button
+          type="submit"
+          className={"btn mt-5 " + (isLoading ? "loading" : "")}
+        >
           Enter
         </button>
       </form>

@@ -15,7 +15,6 @@ type GloalStore = {
   remoteId: string;
   peer: Peer | undefined;
   conn: DataConnection | undefined;
-  status: "idle" | "connecting" | "connected";
   messages: Message[];
   isChatBoxVisible: boolean;
   isAudioOn: boolean;
@@ -33,7 +32,6 @@ export const useGlobalStore = create<GloalStore>(() => ({
   remoteId: "",
   peer: undefined,
   conn: undefined,
-  status: "idle",
   messages: [],
   isChatBoxVisible: true,
   isAudioOn: true,

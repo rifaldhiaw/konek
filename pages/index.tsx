@@ -17,8 +17,7 @@ const ConnectForm = dynamic(() => import("../components/ConnectForm"), {
 });
 
 const Home: NextPage = () => {
-  const peer = useGlobalStore((s) => s.peer);
-  const status = useGlobalStore((s) => s.status);
+  const machineState = useGlobalStore((s) => s.machineState);
   const isDarkMode = useGlobalStore((s) => s.isDarkMode);
 
   useEffect(() => {
@@ -28,20 +27,15 @@ const Home: NextPage = () => {
   }, []);
 
   const renderByStatus = () => {
-    switch (status) {
-      case "idle":
-        return (
-          <div className="flex justify-center items-center flex-1">
-            {peer ? <ConnectForm /> : <LocalIDForm />}
-          </div>
-        );
-
-      case "connecting":
-        return null;
-
-      case "connected":
-        return <Main />;
+    if (machineState === "inCall") {
+      return <Main />;
     }
+
+    return (
+      <div className="flex justify-center items-center flex-1">
+        {machineState === "waitingLocalId" ? <LocalIDForm /> : <ConnectForm />}
+      </div>
+    );
   };
 
   return (
