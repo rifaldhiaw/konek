@@ -21,6 +21,8 @@ const receive = (msg: Message | ConfirmedMessage) => {
 
   const messages = (() => {
     if (msg.status === "pending") {
+      new Audio("./pop.mp3").play();
+
       // Confirm msg received
       const confirmedMessage: ConfirmedMessage = {
         id: msg.id,
