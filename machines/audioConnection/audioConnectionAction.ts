@@ -44,7 +44,7 @@ export const callUser = () => {
 
   call.on("stream", function (remoteStream) {
     console.log("caller rec stream", remoteStream);
-    sendAudioConnEvent("CONNECTED");
+    sendAudioConnEvent("ANSWERED");
     useGlobalStore.setState({ remoteAudio: remoteStream });
   });
 };

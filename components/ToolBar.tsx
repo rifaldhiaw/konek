@@ -1,10 +1,16 @@
+import {
+  sendAudioConnEvent,
+  useAudioConnection,
+} from "../machines/audioConnection/audioConnectionMachine";
 import { useGlobalStore } from "../stores/globalStore";
 import ActionButton from "./ActionButton";
 
 const ToolBar = () => {
   const isChatBoxVisible = useGlobalStore((s) => s.isChatBoxVisible);
   const isVideoOn = useGlobalStore((s) => s.isVideoOn);
-  const isAudioOn = useGlobalStore((s) => s.isAudioOn);
+  const isAudioOn = useAudioConnection((s) =>
+    s.state.matches("inCall.audioOn")
+  );
   const isDarkMode = useGlobalStore((s) => s.isDarkMode);
 
   return (
@@ -28,7 +34,11 @@ const ToolBar = () => {
           isOn={isAudioOn}
           icon="audio"
           onClick={() => {
-            useGlobalStore.setState({ isAudioOn: !isAudioOn });
+            if (isAudioOn) {
+              sendAudioConnEvent("MUTE");
+            } else {
+              sendAudioConnEvent("UNMUTE");
+            }
           }}
         />
       </div>

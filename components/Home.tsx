@@ -4,7 +4,6 @@ import { useDataConnection } from "../machines/dataConnection/dataConnectionMach
 import { useGlobalStore } from "../stores/globalStore";
 import ChatBox from "./ChatBox";
 import ConnectForm from "./ConnectForm";
-import LocalAudio from "./LocalAudio";
 import LocalIDForm from "./LocalIDForm";
 import LocalVideo from "./LocalVideo";
 import RemoteAudio from "./RemoteAudio";
@@ -93,7 +92,6 @@ export const Main = () => {
         )}
       </div>
 
-      <LocalAudio />
       <RemoteAudio />
 
       <ToolBar />

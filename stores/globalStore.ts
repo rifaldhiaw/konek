@@ -16,7 +16,6 @@ type GloalStore = {
   audioCall: MediaConnection | undefined;
   messages: Message[];
   isChatBoxVisible: boolean;
-  isAudioOn: boolean;
   isVideoOn: boolean;
   isDarkMode: boolean;
   localVideo: MediaStream | undefined;
@@ -33,7 +32,6 @@ export const useGlobalStore = create<GloalStore>(() => ({
   audioCall: undefined,
   messages: [],
   isChatBoxVisible: true,
-  isAudioOn: true,
   isVideoOn: false,
   isDarkMode: false,
   localVideo: undefined,
