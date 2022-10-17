@@ -1,7 +1,9 @@
 import Peer, { MediaConnection } from "peerjs";
 import invariant from "tiny-invariant";
 import { createMachine } from "xstate";
-import { Message, sendEvent, useGlobalStore } from "../stores/globalStore";
+import create from "zustand";
+import xstate from "zustand-middleware-xstate";
+import { Message, useGlobalStore } from "../stores/globalStore";
 import { msgUtils } from "../utils/messageUtils";
 
 const initPeer = () => {
@@ -18,7 +20,7 @@ const initPeer = () => {
     });
 
     conn.on("open", () => {
-      sendEvent({ type: "DATA_CONNECTED" });
+      sendConnEvent({ type: "DATA_CONNECTED" });
     });
   });
 };
@@ -35,7 +37,7 @@ const connectData = () => {
   });
 
   conn.on("open", () => {
-    sendEvent({ type: "DATA_CONNECTED" });
+    sendConnEvent({ type: "DATA_CONNECTED" });
   });
 };
 
@@ -52,7 +54,7 @@ const callAudio = () => {
 
       call.on("stream", function (remoteStream) {
         console.log("got sream caller");
-        sendEvent({ type: "AUDIO_CONNECTED" });
+        sendConnEvent({ type: "AUDIO_CONNECTED" });
         useGlobalStore.setState({ remoteAudio: remoteStream });
       });
     })
@@ -71,7 +73,7 @@ const setupAudioConnectionListener = () => {
         call.answer(localStream);
         call.on("stream", (remoteStream) => {
           console.log("got sream in listener");
-          sendEvent({ type: "AUDIO_CONNECTED" });
+          sendConnEvent({ type: "AUDIO_CONNECTED" });
           useGlobalStore.setState({ remoteAudio: remoteStream });
         });
       },
@@ -86,17 +88,26 @@ const setupAudioConnectionListener = () => {
   state.peer.on("call", listener);
 };
 
-export type CoreConnectionState =
-  | "waitingLocalId"
-  | "connectOrWaitingData"
-  | "connectingData"
-  | "connectingAudio"
-  | "waitingAudioConnection"
-  | "inCall";
+type Context = {};
+
+type Events = {
+  type: "SUBMIT_ID" | "CONNECT_DATA" | "DATA_CONNECTED" | "AUDIO_CONNECTED";
+};
+
+type States = {
+  value:
+    | "waitingLocalId"
+    | "connectOrWaitingData"
+    | "connectingData"
+    | "connectingAudio"
+    | "waitingAudioConnection"
+    | "inCall";
+  context: Context;
+};
 
 export const coreConnectionMachine =
   /** @xstate-layout N4IgpgJg5mDOIC5QGMD2AnMBhVA7XYyALgJZ4B0A7gIYmm5QAyqy1ANgJIQDEAygKoAhALIcAKgH0OAEQDaABgC6iUAAdUsOmVwqQAD0QAmefPIB2ABwBOeQFYLARkMA2W2du2ANCACeia+TOQa7uAMxmTg5WFgC+Md5omDj4hKQUaCnEAPLoAOq09FDS1ETU3FhZAHKVAKJYktIAgmKNCspIIOqaaTodBggeVuTyDrbODgAsFhbOVs4R3n4IxhPktiYjFqEOjtEOznEJGNh4BMTa5BlnRDn5WgzFpdxNLRIV1XViNXJKul1aeF0-UGw1G4ymMzmC18-kM5CsCIRWwstkME0MoVshxAiROmR6l1OqRIDxKZRejTeVVq9W+bT+GgBvVA-QcIzhoWMhkcHjMzgmrkWRnkq3WJh2212jgO8Rxx2S1wuV2JDEaAFcIGRuI1+NIOFkqR9aT92mpGT0gYhJutyNyHA4zBNJUFQkLloYzPDph6PIYXJNRtjcQriRQaPcoOrNagQ+c8NrdfrDTSviaGd1tJaEE4JrY1qFrFYIs4-eEHG62c5yBDDB57HN7OE4rLcKgIHBdMGiXHcFQCiSmCx2Fx00ys+iKw5QoFbBMrJNHaNwkWg-LuwTldk8v3SaVRxa+ohQqEhiirOFxqETFsPJPp64525DDsUY-V0l10rP7vqPvM4eEC2T0bBLUIJnkCx5DA+Y3T9Cxq2mbYzERc97VCd88UVdJv0jDUyD-QEAKcew1msMwzDsHN+QsWDuQQrYHRQ7Ypww2MCXDQoozINj-zNDNCJZK12XITl5DtXl+UFGFs3kKtogsQxolk2YwhlI4P3xC4SSwdg2AI5l9CtIJTDEzkglREVZysSdVlGR9nGmF0bAmVjPwEzpzV4wyEAAWmcN0-ObGIgA */
-  createMachine<{}>(
+  createMachine<Context, Events, States>(
     {
       context: {},
       predictableActionArguments: true,
@@ -159,3 +170,7 @@ export const coreConnectionMachine =
       },
     }
   );
+
+export const useConnectionMachine = create(xstate(coreConnectionMachine));
+
+export const sendConnEvent = useConnectionMachine.getState().send;

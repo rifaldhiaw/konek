@@ -51,11 +51,6 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz#b520529ec21d8e5945a1851dfd1c32e94e39ff45"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
-"@iconify/types@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@iconify/types/-/types-2.0.0.tgz#ab0e9ea681d6c8a1214f30cd741fe3a20cc57f57"
-  integrity sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==
-
 "@next/env@12.3.1":
   version "12.3.1"
   resolved "https://registry.yarnpkg.com/@next/env/-/env-12.3.1.tgz#18266bd92de3b4aa4037b1927aa59e6f11879260"
@@ -1143,13 +1138,6 @@ has@^1.0.3:
   dependencies:
     function-bind "^1.1.1"
 
-iconify-icon@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/iconify-icon/-/iconify-icon-1.0.1.tgz#c715762b373540bde84252becf29c76babe63a17"
-  integrity sha512-8qXahj8q0fJ1uMkVJ1DujJw35CWBFxUY9UFCzytfItNjcoj+Dz7yUakuXTzaByIc8seQCnw9CuLVzHdw7yEkBQ==
-  dependencies:
-    "@iconify/types" "^2.0.0"
-
 ignore@^5.2.0:
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-5.2.0.tgz#6d3bac8fa7fe0d45d9f9be7bac2fc279577e345a"
@@ -2179,6 +2167,11 @@ yocto-queue@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/yocto-queue/-/yocto-queue-0.1.0.tgz#0294eb3dee05028d31ee1a5fa2c556a6aaf10a1b"
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
+
+zustand-middleware-xstate@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/zustand-middleware-xstate/-/zustand-middleware-xstate-1.1.1.tgz#94fff8d79430672318844a027907dc0f564fef56"
+  integrity sha512-WNKGWzWwytk5dfnIR595r0BkA9ojhxgw29MG0IQzSW/DNf4x2rrdW5paqB4Hpf6NVWO00OiEuvmqmNknHmnfdA==
 
 zustand@^4.1.2:
   version "4.1.2"
