@@ -1,27 +1,15 @@
 import { ChangeEventHandler, FormEventHandler } from "react";
-import invariant from "tiny-invariant";
-import { Message, useGlobalStore } from "../stores/globalStore";
-import { msgUtils } from "../utils/messageUtils";
+import { coreConnectionService } from "../machines/coreConnectionMachine";
+import { useGlobalStore } from "../stores/globalStore";
 
 const ConnectForm = () => {
   const remoteId = useGlobalStore((s) => s.remoteId);
-  const peer = useGlobalStore((s) => s.peer);
 
   const onSubmit: FormEventHandler = (e) => {
     e.preventDefault();
     if (!remoteId.trim()) return;
 
-    invariant(peer);
-    const conn = peer.connect(remoteId);
-    useGlobalStore.setState({ conn, isMeCaller: true });
-
-    conn.on("data", (data) => {
-      msgUtils.receive(data as Message);
-    });
-
-    conn.on("open", () => {
-      useGlobalStore.setState({ status: "connected" });
-    });
+    coreConnectionService.send({ type: "CONNECT_DATA" });
   };
 
   const onIdChange: ChangeEventHandler<HTMLInputElement> = (e) => {

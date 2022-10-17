@@ -1,5 +1,6 @@
 import Peer, { DataConnection } from "peerjs";
 import create from "zustand";
+import { CoreConnectionState } from "../machines/coreConnectionMachine";
 
 export type Message = {
   id: string;
@@ -9,9 +10,9 @@ export type Message = {
 };
 
 type GloalStore = {
+  machineState: CoreConnectionState;
   localId: string;
   remoteId: string;
-  isMeCaller: boolean;
   peer: Peer | undefined;
   conn: DataConnection | undefined;
   status: "idle" | "connecting" | "connected";
@@ -24,13 +25,12 @@ type GloalStore = {
   localAudio: MediaStream | undefined;
   remoteVideo: MediaStream | undefined;
   remoteAudio: MediaStream | undefined;
-  isConnectingAudio: boolean;
 };
 
 export const useGlobalStore = create<GloalStore>(() => ({
+  machineState: "waitingLocalId",
   localId: "",
   remoteId: "",
-  isMeCaller: false,
   peer: undefined,
   conn: undefined,
   status: "idle",
@@ -43,5 +43,4 @@ export const useGlobalStore = create<GloalStore>(() => ({
   localAudio: undefined,
   remoteVideo: undefined,
   remoteAudio: undefined,
-  isConnectingAudio: false,
 }));

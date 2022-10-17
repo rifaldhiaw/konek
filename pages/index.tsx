@@ -1,6 +1,7 @@
 import "iconify-icon";
 import type { NextPage } from "next";
 import dynamic from "next/dynamic";
+import { useEffect } from "react";
 import ChatBox from "../components/ChatBox";
 import LocalAudio from "../components/LocalAudio";
 import LocalVideo from "../components/LocalVideo";
@@ -19,6 +20,12 @@ const Home: NextPage = () => {
   const peer = useGlobalStore((s) => s.peer);
   const status = useGlobalStore((s) => s.status);
   const isDarkMode = useGlobalStore((s) => s.isDarkMode);
+
+  useEffect(() => {
+    import("../machines/coreConnectionMachine").then((o) => {
+      o.coreConnectionService.start();
+    });
+  }, []);
 
   const renderByStatus = () => {
     switch (status) {

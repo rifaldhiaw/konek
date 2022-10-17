@@ -1,7 +1,6 @@
-import Peer from "peerjs";
 import { ChangeEventHandler, FormEventHandler } from "react";
-import { Message, useGlobalStore } from "../stores/globalStore";
-import { msgUtils } from "../utils/messageUtils";
+import { coreConnectionService } from "../machines/coreConnectionMachine";
+import { useGlobalStore } from "../stores/globalStore";
 
 const LocalIDForm = () => {
   const localId = useGlobalStore((s) => s.localId);
@@ -10,20 +9,7 @@ const LocalIDForm = () => {
     e.preventDefault();
     if (!localId) return;
 
-    const peer = new Peer(localId);
-    useGlobalStore.setState({ peer });
-
-    peer.on("connection", (conn) => {
-      useGlobalStore.setState({ conn });
-
-      conn.on("data", (data) => {
-        msgUtils.receive(data as Message);
-      });
-
-      conn.on("open", () => {
-        useGlobalStore.setState({ status: "connected" });
-      });
-    });
+    coreConnectionService.send({ type: "SUBMIT_ID" });
   };
 
   const onIdChange: ChangeEventHandler<HTMLInputElement> = (e) => {
