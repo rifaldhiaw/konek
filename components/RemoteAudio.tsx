@@ -16,10 +16,6 @@ const RemoteAudio = () => {
         invariant(audioRef.current);
         audioRef.current.play();
       };
-
-      return () => {
-        remoteAudio.getAudioTracks().forEach((v) => v.stop());
-      };
     }
   }, [remoteAudio]);
 
