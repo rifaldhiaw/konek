@@ -53,7 +53,7 @@ const MessageBubble = (props: { message: Message; isMine: boolean }) => {
     <div
       className={
         "rounded-lg shadow-md px-2 py-1 " +
-        (props.isMine ? "bg-green-100 text-neutral" : "bg-base-100")
+        (props.isMine ? "bg-primary text-primary-content" : "bg-base-100")
       }
     >
       <div
