@@ -4,20 +4,20 @@ import { Message, useGlobalStore } from "../stores/globalStore";
 type ConfirmedMessage = { id: string; status: "succeed" };
 
 const send = (msgBody: string) => {
-  const store = useGlobalStore.getState();
+  const state = useGlobalStore.getState();
   const msg: Message = {
     id: nanoid(),
-    owner: store.localId,
+    owner: state.localId,
     body: msgBody,
     status: "pending",
   };
-  useGlobalStore.setState({ messages: [...store.messages, msg] });
+  useGlobalStore.setState({ messages: [...state.messages, msg] });
 
-  store.conn?.send(msg);
+  state.conn?.send(msg);
 };
 
 const receive = (msg: Message | ConfirmedMessage) => {
-  const store = useGlobalStore.getState();
+  const state = useGlobalStore.getState();
 
   const messages = (() => {
     if (msg.status === "pending") {
@@ -28,14 +28,14 @@ const receive = (msg: Message | ConfirmedMessage) => {
         id: msg.id,
         status: "succeed",
       };
-      store.conn?.send(confirmedMessage);
+      state.conn?.send(confirmedMessage);
 
       const msgObjUpdated: Message = { ...msg, status: "succeed" };
-      return [...store.messages, msgObjUpdated];
+      return [...state.messages, msgObjUpdated];
     }
 
     if (msg.status === "succeed") {
-      return store.messages.map((m) =>
+      return state.messages.map((m) =>
         m.id === msg.id ? ({ ...m, status: "succeed" } as Message) : m
       );
     }
